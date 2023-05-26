@@ -1,0 +1,42 @@
+abstract class Metal {
+    public abstract int getEndurance();
+    }
+class steel extends Metal {
+    @Override
+    public int getEndurance() {
+        return (50);
+    }
+}
+class copper extends Metal {
+    @Override
+    public int getEndurance() {
+        return (20);
+    }
+}
+class iron extends Metal {
+    @Override
+    public int getEndurance() {
+        return (30);
+    }
+}
+ class Plastiс {
+     static class Sword<T extends Metal> {
+         private final T metal;
+
+         public Sword(T metal) {
+
+             this.metal = metal;
+
+         }
+
+         public boolean checkEndurance() {
+
+             return metal.getEndurance() > 49;
+         }
+     }
+         public static void main(String[] args) {
+             Sword<steel> steelSword = new Plastiс.Sword<>(new steel());
+             boolean isStrong = steelSword.checkEndurance();
+             System.out.println("Меч из стали " + (isStrong ? "прошел " : "не прошел ") + "проверку прочности");
+         }
+     }
