@@ -1,0 +1,61 @@
+import java.util.ArrayList;
+
+public class HashSet {
+    private ArrayList<Integer>[] table;
+    private int capacity;
+    private int size;
+
+    public HashSet() {
+        capacity = 16;
+        size = 0;
+        table = new ArrayList[capacity];
+        for (int i = 0; i < capacity; i++) {
+            table[i] = new ArrayList<>();
+        }
+    }
+
+    public void add(int value) {
+        if (!contains(value)) {
+            int index = hash(value);
+
+            table[index].add(value);
+            size++;
+            if (size > capacity * 0.75) {
+                resize();
+            }
+        }
+    }
+
+    public void remove(int value) {
+        int index = hash(value);
+
+        table[index].removeIf(element -> element == value);
+    }
+
+    public boolean contains(int value) {
+        int index = hash(value);
+        return table[index].contains(value);
+    }
+
+    private int hash(int value) {
+        return Math.abs(value % capacity);
+    }
+
+    private void resize() {
+        capacity *= 2;
+        ArrayList<Integer>[] newTable = new ArrayList[capacity];
+        for (int i = 0; i < capacity; i++) {
+            newTable[i] = new ArrayList<>();
+        }
+        for (ArrayList<Integer> list : table) {
+            for (int element : list) {
+                int index = hash(element);
+
+                newTable[index].add(element);
+            }
+        }
+        table = newTable;
+    }
+    public static void main(String[] args) {
+    }
+}
