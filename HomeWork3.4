@@ -1,0 +1,26 @@
+import java.util.Comparator;
+import java.util.TreeMap;
+
+public class TreeSet<E> {
+    private TreeMap<E, Object> map;
+    private static final Object Present = new Object();
+
+    public TreeSet() {
+        map = new TreeMap<>();
+    }
+
+    public boolean add(E element){
+        return map.put(element, Present) == null;
+    }
+
+    public boolean remove(E element) {
+        return map.remove(element) == Present;
+    }
+
+    public boolean contains(E element) {
+        return map.containsKey(element);
+    }
+
+    public static void main(String[] args) {
+    }
+}
