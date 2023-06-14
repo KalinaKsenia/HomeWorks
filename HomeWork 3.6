@@ -1,63 +1,44 @@
-import java.util.Arrays;
+import java.util.ArrayList;
 
 public class PriorityQueue {
-    private int[] heap;
-    private int size;
+    private ArrayList<Integer> elements;
 
     public PriorityQueue() {
-        heap = new int[10];
-        size = 0;
+        elements = new ArrayList<Integer>();
     }
 
+    //Метод добавления
     public void add(int element) {
-        if (size == heap.length) {
-            heap = Arrays.copyOf(heap, size * 2);
+//Если очередь пустая, то добавляем элемент        
+        if (elements.isEmpty()) {
+            elements.add(element);
+        } else {
+// Иначе ищем место для вставки элемента в порядке убывания
+            int index = 0;
+            while (index < elements.size() && element < elements.get(index)) {
+                index++;
+            }
+// Вставляем элемент в найденное место
+            elements.add(index, element);
         }
-        heap[size] = element;
-        size++;
-        heapifyUp(size - 1);
     }
-
     public int remove() {
-        if (size == 0) {
-            throw new IllegalStateException("Priority queue is empty");
+        if (elements.isEmpty()) {
+            throw new RuntimeException("Queue is empty");
         }
-        int result = heap[0];
-        heap[0] = heap[size - 1];
-        size--;
-        heapifyDown(0);
-        return result;
+        return elements.remove(0);
     }
 
-    private void heapifyUp(int index) {
-        int parent = (index - 1) / 2;
-        if (index > 0 && heap[index] > heap[parent]) {
-            swap(index, parent);
-            heapifyUp(parent);
-        }
-    }
-
-    private void heapifyDown(int index) {
-        int leftChild = 2 * index + 1;
-        int rightChild = 2 * index + 2;
-        int largest = index;
-        if (leftChild < size && heap[leftChild] > heap[largest]) {
-            largest = leftChild;
-        }
-        if (rightChild < size && heap[rightChild] > heap[largest]) {
-            largest = rightChild;
-        }
-        if (largest != index) {
-            swap(index, largest);
-            heapifyDown(largest);
-        }
-    }
-
-    private void swap(int i, int j) {
-        int temp = heap[i];
-        heap[i] = heap[j];
-        heap[j] = temp;
+    public boolean isEmpty() {
+        return elements.isEmpty();
     }
     public static void main(String[] args) {
+        PriorityQueue queue = new PriorityQueue();
+        queue.add(50);
+        queue.add(1);
+        queue.add(2);
+        System.out.println(queue.remove());
+        System.out.println(queue.remove());
+        System.out.println(queue.remove());
     }
 }
