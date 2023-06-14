@@ -1,61 +1,55 @@
 import java.util.ArrayList;
-
-public class HashSet {
-    private ArrayList<Integer>[] table;
-    private int capacity;
+public class HashSet<S> {
+    private ArrayList<Object>[] buckets;
     private int size;
+    private static final int INITIAL_CAPACITY = 16;
 
     public HashSet() {
-        capacity = 16;
+        buckets = new ArrayList[INITIAL_CAPACITY];
         size = 0;
-        table = new ArrayList[capacity];
-        for (int i = 0; i < capacity; i++) {
-            table[i] = new ArrayList<>();
-        }
     }
 
-    public void add(int value) {
-        if (!contains(value)) {
-            int index = hash(value);
-
-            table[index].add(value);
+    public void add(Object obj) {
+        int bucketIndex = getBucketIndex(obj);
+        if (buckets[bucketIndex] == null) {
+            buckets[bucketIndex] = new ArrayList<>();
+        }
+        if (!buckets[bucketIndex].contains(obj)) {
+            buckets[bucketIndex].add(obj);
             size++;
-            if (size > capacity * 0.75) {
-                resize();
-            }
         }
     }
 
-    public void remove(int value) {
-        int index = hash(value);
-
-        table[index].removeIf(element -> element == value);
-    }
-
-    public boolean contains(int value) {
-        int index = hash(value);
-        return table[index].contains(value);
-    }
-
-    private int hash(int value) {
-        return Math.abs(value % capacity);
-    }
-
-    private void resize() {
-        capacity *= 2;
-        ArrayList<Integer>[] newTable = new ArrayList[capacity];
-        for (int i = 0; i < capacity; i++) {
-            newTable[i] = new ArrayList<>();
+    public void remove(Object obj) {
+        int bucketIndex = getBucketIndex(obj);
+        if (buckets[bucketIndex] != null) {
+            buckets[bucketIndex].remove(obj);
+            size--;
         }
-        for (ArrayList<Integer> list : table) {
-            for (int element : list) {
-                int index = hash(element);
+    }
 
-                newTable[index].add(element);
-            }
+    public boolean contains(Object obj) {
+        int bucketIndex = getBucketIndex(obj);
+        if (buckets[bucketIndex] != null) {
+            return buckets[bucketIndex].contains(obj);
         }
-        table = newTable;
+        return false;
+    }
+
+    public int size() {
+        return size;
+    }
+
+    private int getBucketIndex(Object obj) {
+        int hashCode = obj.hashCode();
+        return Math.abs(hashCode % buckets.length);
     }
     public static void main(String[] args) {
+        HashSet<String> set = new HashSet<String>();
+        set.add("1");
+        set.add("3");
+        set.add("9");
+        set.remove("3");
+            System.out.println(set);
+        }
     }
-}
