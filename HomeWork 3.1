@@ -1,42 +1,40 @@
 abstract class Metal {
-    public abstract int getEndurance();
+    abstract int getEndurance();
     }
-class steel extends Metal {
+class Steel extends Metal {
     @Override
-    public int getEndurance() {
-        return (50);
-    }
-}
-class copper extends Metal {
-    @Override
-    public int getEndurance() {
-        return (20);
+    int getEndurance() {
+        return 50;
     }
 }
-class iron extends Metal {
+class Copper extends Metal {
     @Override
-    public int getEndurance() {
-        return (30);
+    int getEndurance() {
+        return 20;
+    }
+}
+class Iron extends Metal {
+    @Override
+    int getEndurance() {
+        return 30;
     }
 }
  class Plastiс {
-     static class Sword<T extends Metal> {
-         private final T metal;
+ }
+     class Sword<M extends Metal> {
+         private M material;
 
-         public Sword(T metal) {
-
-             this.metal = metal;
-
+         public Sword(M material) {
+             this.material = material;
          }
-
          public boolean checkEndurance() {
-
-             return metal.getEndurance() > 49;
+             return material.getEndurance() > 49;
          }
      }
+     public class Test{
          public static void main(String[] args) {
-             Sword<steel> steelSword = new Plastiс.Sword<>(steel);
-             boolean isStrong = steelSword.checkEndurance();
-             System.out.println("Меч из стали " + (isStrong ? "прошел " : "не прошел ") + "проверку прочности");
+             Sword<Steel> steelSword = new Sword<>(new Steel());
+             System.out.println("Меч из стали прошел проверку прочности: " + steelSword.checkEndurance());
          }
      }
+
