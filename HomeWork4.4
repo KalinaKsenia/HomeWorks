@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/opActivityB"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f44336"
+    tools:context=".ActivityA">
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Open_ActivityB"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+package com.example.myapplication;
+
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class ActivityA extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_a);
+        Button buttonActB = findViewById(R.id.opActivityB);
+        buttonActB.setOnClickListener(view -> {
+                Intent intent = new Intent(ActivityA.this, ActivityB.class);
+                startActivity(intent);
+        });
+    }
+}
+
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#4caf50"
+    tools:context=".ActivityB">
+
+    <Button
+        android:id="@+id/opActivityC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Open ActivityC"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+package com.example.myapplication;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.view.View;
+import android.widget.Button;
+import android.os.Bundle;
+
+public class ActivityB extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_b);
+        Button buttonActC = findViewById(R.id.opActivityC);
+        buttonActC.setOnClickListener(view -> {
+                Intent intent = new Intent(ActivityB.this, ActivityC.class);
+                startActivity(intent);
+            });
+        }
+    }
+
+
+
+
+    <?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2196F3"
+    tools:context=".ActivityC">
+
+    <Button
+        android:id="@+id/opActivityA_ftomC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:text="Open ActivityA"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/opActivityD_fromC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Open ActivityD"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/opActivityA_ftomC" />
+
+    <Button
+        android:id="@+id/clActivityC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Close ActivityC"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/opActivityD_fromC" />
+
+    <Button
+        android:id="@+id/close_stack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Close Stack"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/clActivityC" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+package com.example.myapplication;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
+public class ActivityC extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_c);
+
+        Button btActAfromC = findViewById(R.id.opActivityD_fromC);
+        btActAfromC.setOnClickListener(view -> {
+                Intent intent = new Intent(ActivityC.this, ActivityA.class);
+                startActivity(intent);
+            });
+
+        Button btActDfromC = findViewById(R.id.opActivityD_fromC);
+        btActAfromC.setOnClickListener(view -> {
+                Intent intent = new Intent(ActivityC.this, ActivityD.class);
+                finishAffinity();
+                startActivity(intent);
+            });
+
+        Button btclActC = findViewById(R.id.clActivityC);
+        btclActC.setOnClickListener(view -> {
+            Intent intent = new Intent(ActivityC.this, ActivityB.class);
+            startActivity(intent);
+            });
+
+        Button btclstack = findViewById(R.id.close_stack);
+        btclstack.setOnClickListener(view -> finishAffinity());
+    }
+}
+
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffeb3b"
+    tools:context=".ActivityD">
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+package com.example.myapplication;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+
+public class ActivityD extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_d);
+    }
+}
+
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyApplication"
+        tools:targetApi="31">
+        <activity
+            android:name=".ActivityD"
+            android:exported="false"
+            android:taskAffinity="com.some.new.affinity"/>
+        <activity
+            android:name=".ActivityC"
+            android:exported="false"
+            android:taskAffinity="com.some.new.affinity"/>
+        <activity
+            android:name=".ActivityB"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.some.new.affinity"/>
+        <activity
+            android:name=".ActivityA"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
