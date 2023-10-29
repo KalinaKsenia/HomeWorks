@@ -1,0 +1,346 @@
+package ru.web.notes.config;
+
+@Configuration
+@ComponentScan("ry.web.notes")
+@EnableWebMvc
+public class NotesConfig implements WebMvcConfigurer{
+    private final ApplicationContext applicationContext;
+    @Autowired
+    public NotesConfig(ApplicationContext applicationContext) { this.applicationContext = applicationContext;}
+    @Bean
+    public SpringResourceTemplateResolver templateResolver() {
+        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+        templateResolver.setApplicationContext(applicationContext);
+        templateResolver.setPrefix("/WEB-INF/views/");
+        templateResolver.setSuffix(".html");
+        return templateResolver;
+    }
+    @Bean
+    public SpringTemplateEngine templateEngine() {
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver());
+        templateEngine.setEnableSpringELCompiler(true);
+        return templateEngine;
+    }
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+        ThymeleafViewResolver resolver = new ThymeleafViewResolver();
+        resolver.setTemplateEngine(templateEngine());
+        registry.viewResolver(resolver);
+    }
+}
+
+
+
+
+
+package ru.web.notes.config;
+
+import org.springframework.web.filter.HiddenHttpMethodFilter;
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+
+public class NotesMvcDispatcherServletInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+    protected Class<?>[] getRootConfigClasses() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    @Override
+    protected Class<?>[] getServletConfigClasses() {
+        // TODO Auto-generated method stub
+        return new Class[] {NotesConfig.class};
+    }
+    @Override
+    protected String[] getServletMappings() {
+        // TODO Auto-generated method stub
+        return new String[] {"/"};
+    }
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+        super.onStartup(servletContext);
+        registerHiddenFieldFilter (servletContext)
+    }
+    private void registerHiddenFieldFilter(ServletContext aContext) {
+        aContext.addFilter("hiddenHttpMethodFilter", new HiddenHttpMethodFilter()).addMappingForUrlPatterns(null, true, "/*");
+    }
+}
+
+
+
+
+
+
+package ru.web.notes.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import ru.web.notes.deo.WebNoteDAO;
+import ru.web.notes.models.WebNote;
+
+@Controller
+@RequestMapping("/notes")
+public class NotesController {
+    private final WebNoteDAO dao;
+
+    @Autowired
+    public NotesController(WebNoteDAO dao) {
+        this.dao = dao;
+    }
+
+    @GetMapping()
+    public String index(Model model) {
+        model.addAttribute("notes", dao.index());
+        return "notes/index";
+    }
+
+    @GetMapping("/{id}")
+    public String show(@PathVariable("id") int id, Model model) {
+        System.out.println("==> SHOW");
+        model.addAttribute("note", dao.show(id));
+        return "notes/show";
+    }
+
+    @GetMapping("/help")
+    public String getHelp() {
+        System.out.println("Help!!!");
+        return "notes/help";
+    }
+
+    @GetMapping("/new")
+    public String newNote(Model model) {
+        System.out.println("==> NEW");
+        model.addAttribute("webNote", new WebNote());
+        return "notes/new";
+    }
+
+    @GetMapping("{id}/edit")
+    public String edit(Model model, @PathVariable("id") int id) {
+        System.out.println("==> EDIT");
+        model.addAttribute("webNote", dao.show(id));
+        return "notes/edit";
+    }
+
+    @PatchMapping("/{id}")
+    public String update(@ModellAttribute("webNote") WebNote webNote, @PathVariable("id") int id) {
+        System.out.println("==> UPDATE");
+        dao.update(id, webNote);
+        return "redirect:/notes";
+    }
+}
+
+
+
+
+
+
+package ru.web.notes.deo;
+
+import ru.web.notes.models.WebNote;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Component
+public class WebNoteDAO {
+    private static int NOTES_COUNT;
+    private List<WebNote> notes;
+    public WebNoteDAO() {
+        notes = new ArrayList<WebNote>();
+        notes.add(new WebNote(++NOTES_COUNT, "Masha"));
+        notes.add(new WebNote(++NOTES_COUNT, "Gleb"));
+        notes.add(new WebNote(++NOTES_COUNT, "Kail"));
+        notes.add(new WebNote(++NOTES_COUNT, "Sten"));
+        notes.add(new WebNote(++NOTES_COUNT, "Arik"));
+    }
+
+    public List<WebNote> index() {
+        return notes;
+    }
+    public WebNote show(int id) {
+        System.out.println("WebNote show() id = "+id);
+        return notes.stream().filter(n->.getId()==id).findAny().orElse(null);
+    }
+    public void save(WebNote note) {
+        note.setId(++NOTES_COUNT);
+        notes.add(note);
+    }
+    public void update(int id, WebNote updateNote) {
+        System.out.println("update "+ id);
+        WebNote toUpdateNote = show(id);
+        toUpdateNote.setNote(updateNote.getNote());
+    }
+    public void delete(int id) {
+        notes.removeIf(n->n.getId()==id);
+    }
+}
+
+
+
+
+
+
+package ru.web.notes.models;
+
+public class WebNote {
+    private int id;
+    private String note;
+    public WebNote(int id, String note) {
+        this.id = id;
+        this.note = note;
+    }
+    public WebNote() {
+        // TODO Auto-generated method stub
+    }
+    public int getId() {return id;}
+    public void setId(int id) {this.id = id;}
+    public String getNote() {return note;}
+    public void setNote(String note) {this.note = note;}
+}
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta http-equiv ="Content-Type" content="text/html; charset=UTF-8">
+    <title>Edit notes</title>
+</head>
+<body>
+<form th:method="PATCH" th:action="@{/notes/{id}/edit (id=${webNote.getId()})}" th:object = "${webNote}">
+    <label for "note">Enter note:</label>
+    <input type="text" th:field="*{note}" id = "note"/>
+    <input type="submit" value="Update note"/>
+</form>
+</body>
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta http-equiv ="Content-Type" content="text/html; charset=UTF-8">
+    <title>Help</title>
+</head>
+<body>
+<h1 style="...">
+    Help me!!!!</h1>
+</body>
+</html>
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta http-equiv ="Content-Type" content="text/html; charset=UTF-8">
+    <title>All notes</title>
+</head>
+<body>
+<table border="0">
+    <div th:each="note : ${notes}">
+    <tr>
+        <td th:text="${note.getId()}" width="30%">
+            text
+        </td>
+        <a>
+        <a th:href="@{/notes/{id} (id=${note.getId()})}" th:text="${note.getNote()}"> note </a>
+        </td>
+        <td>
+            <form th:action="@{/notes/{id}/edit (id=${note.getId()})}">
+                <input type="submit" value="Edit"/>
+            </form>
+        </td>
+        <td>
+            <form th:method="DELETE" th:action="@{/notes/{id}(id=${note.getId()})}">
+                <input type="submit" value="Delete"/>
+            </form>
+        </td>
+    </tr>
+    </div>
+    <tr>
+        <tfoot>
+        <a href = "/notes/notes/new"> Add new note</a>
+        </tfoot>
+    </tr>
+</table>
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta http-equiv ="Content-Type" content="text/html; charset=UTF-8">
+    <title>New note</title>
+</head>
+<body>
+            <form th:method="POST" th:action="@{/notes" th:object = "${webNote}">
+                <label for "note">Enter note</label>
+                <input type="text" th:field="*{note}" id = "note"/>
+                <input type="submit" value="Add note"/>
+            </form>
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta http-equiv ="Content-Type" content="text/html; charset=UTF-8">
+    <title>Note</title>
+</head>
+<body>
+<H1>Notes</H1>
+<table border="1">
+    <tr>
+        <td th:text="${note.getId()}">id</td>
+        <td th:text="${note.getNote()}">note</td>
+        <td>
+            <form th:action="@{/notes/{id}/edit (id=${note.getId()})}">
+                <input type="submit" value="Edit"/>
+            </form>
+        </td>
+        <td>
+            <form th:method="DELETE" th:action="@{/notes/{id}(id=${note.getId()})}">
+                <input type="submit" value="Delete"/>
+            </form>
+        </td>
+    </tr>
+</table>
+
+
+
+
+
+
+<html> lang="ru">
+<head>
+<meta charset="UTF-8"/>
+</head>
+<body>
+<h2>My Note</h2>
+<table width = 45%>
+<tr><td><a href = "/notes/notes">Note list</a><br></td></tr>
+<tr><td><a href = "/notes/notes/new">Add new note</a><br></td></tr>
+</table>
+</body>
+</html>
